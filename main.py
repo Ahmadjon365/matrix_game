@@ -22,8 +22,13 @@ class Game:
             self.zone[ix][iy] = 'I'
 
         ex, ey = self.place_randomly()
-        self.enemy = DUSHMAN(ex, ey, size=5, power=30)
-        self.zone[self.enemy.x][self.enemy.y] = 'E'
+        self.enemies = []
+        for _ in range(5):
+            ex, ey = self.place_randomly()
+            enemy = DUSHMAN(ex, ey, power=30)
+            self.enemies.append(enemy)
+            self.zone[enemy.x][enemy.y] = 'E'
+
 
     def place_in_corner(self, corner):
         return {
@@ -52,7 +57,7 @@ class Game:
                 dx, dy = self.moves[move]
                 nx, ny = self.PLAYER.x + dx, self.PLAYER.y + dy
 
-                if 0 <= nx < len(self.zone[0]) and 0 <= ny < len(self.zone):
+                if 0 <= nx < len(self.zone) and 0 <= ny < len(self.zone[0]):
                     self.zone[self.PLAYER.x][self.PLAYER.y] = '*'
                     self.PLAYER.move_player(dx, dy, self.zone)
 
@@ -62,23 +67,30 @@ class Game:
                     elif (self.PLAYER.x, self.PLAYER.y) == (self.t_x, self.t_y):
                         print("Tabriklaymiz! Xazinani topdingiz! 🎉")
                         break
-                    elif (self.PLAYER.x, self.PLAYER.y) == (self.enemy.x, self.enemy.y):
-                        if self.PLAYER.power >= self.enemy.power:
-                            print("Dushmanni yengdingiz! ✅")
-                            self.PLAYER.power -= self.enemy.power
-                            print(f"Sizda {self.PLAYER.power} kuch qoldi!")
-                            self.zone[self.enemy.x][self.enemy.y] = '*'
-                            self.enemy = None  # Dushman o'yindan chiqariladi
-                        else:
-                            print("Dushmanga yutqazdingiz! ❌")
-                            break
+                    elif self.enemies:
+                        for enemy in self.enemies:
+                                if (self.PLAYER.x, self.PLAYER.y) == (enemy.x, enemy.y):
+                                    if self.PLAYER.power >= enemy.power:
+                                        print("Dushmanni yengdingiz! ✅")
+                                        self.PLAYER.power -= enemy.power
+                                        print(f"Sizda {self.PLAYER.power} kuch qoldi!")
+                                        self.zone[enemy.x][enemy.y] = '*'  # zonadan o‘chiramiz
+                                        self.enemies.remove(enemy)
+                                        break
+                                    else:
+                                        print("Dushmanga yutqazdingiz! ❌")
+                                        break
 
                     self.zone[self.PLAYER.x][self.PLAYER.y] = self.OYINCHI
-
-                if self.enemy is not None:
-                    self.zone[self.enemy.x][self.enemy.y] = '*'
-                    self.enemy.move_randomly(self.zone)
-                    self.zone[self.enemy.x][self.enemy.y] = 'E'
+                
+                # Har bir dushman yuradi
+                for enemy in self.enemies:
+                        # Eski joyini tozalaymiz
+                        self.zone[enemy.x][enemy.y] = '*'
+                        # Harakat qiladi
+                        enemy.move_randomly(self.zone)
+                        # Yangi joyini qo'yamiz
+                        self.zone[enemy.x][enemy.y] = 'E'
 
             self.print_zone()
 
