@@ -82,15 +82,17 @@ class Game:
                                         break
 
                     self.zone[self.PLAYER.x][self.PLAYER.y] = self.OYINCHI
-                
+
                 # Har bir dushman yuradi
                 for enemy in self.enemies:
-                        # Eski joyini tozalaymiz
-                        self.zone[enemy.x][enemy.y] = '*'
-                        # Harakat qiladi
-                        enemy.move_randomly(self.zone)
-                        # Yangi joyini qo'yamiz
-                        self.zone[enemy.x][enemy.y] = 'E'
+                    # Eski joyini tozalaymiz
+                    self.zone[enemy.x][enemy.y] = '*'
+                    # Harakat qiladi
+                    enemy.move_randomly(self.zone)
+                    # enemy.move_towards_player(self.PLAYER.x, self.PLAYER.y, self.zone, self.enemies) # O'yinchini quvlash
+
+                    # Yangi joyini qo'yamiz
+                    self.zone[enemy.x][enemy.y] = 'E'
 
             self.print_zone()
 
